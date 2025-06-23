@@ -1,9 +1,25 @@
-# Install the base requirements for the app.
-# This stage is to support development.
-FROM --platform=$BUILDPLATFORM python:alpine AS base
+# Етап 1: Install dependencies
+FROM python:3.11-slim AS base
+
 WORKDIR /app
+
+# Инсталираме системните зависимости
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+
+RUN pip install --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
+
+# Етап 2: Продължаваш с другите слоеве
+# FROM node:18-slim или alpine – според нуждите
 
 FROM --platform=$BUILDPLATFORM node:18-alpine AS app-base
 WORKDIR /app
